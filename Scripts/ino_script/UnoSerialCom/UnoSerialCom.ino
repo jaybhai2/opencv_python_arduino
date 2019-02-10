@@ -14,8 +14,12 @@ void loop() {
  while (FreqCounter::f_ready == 0)         // wait until counter ready
  
  frq=FreqCounter::f_freq;            // read result
+
+ 
  Serial.println(frq);                // print result
- delay(20);
+ delay(500);
+
+
 }
 
 

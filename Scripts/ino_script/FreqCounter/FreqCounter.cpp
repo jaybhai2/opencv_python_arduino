@@ -116,10 +116,12 @@ if (FreqCounter::f_tics >= FreqCounter::f_period) {
     
                                         // calculate now frequeny value
     FreqCounter::f_freq=0x10000 * FreqCounter::f_mlt;  // mult #overflows by 65636
-    FreqCounter::f_freq += TCNT1;      	// add counter1 value
-    FreqCounter::f_mlt=0;
     
+	FreqCounter::f_freq += TCNT1;      	// add counter1 value
+    FreqCounter::f_mlt=0;
+   
     }
+	
     FreqCounter::f_tics++;            	// count number of interrupt events
     if (TIFR1 & 1) {          			// if Timer/Counter 1 overflow flag
     FreqCounter::f_mlt++;               // count number of Counter1 overflows
