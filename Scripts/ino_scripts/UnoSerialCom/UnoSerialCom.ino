@@ -17,7 +17,7 @@ void loop() {
 
  
  Serial.println(frq);                // print result
- delay(500);
+ delay(200);
 
 
 }

@@ -7,8 +7,7 @@
 RH_ASK driver(2000,"",3,10); // ESP8266: do not use pin 11
 long int frqInt;
 //String frqStr = "";
-int movingSum=0;
-int movingAve=0;
+
 int count=0;
 //onst char *frqStr ="";
 void setup()
@@ -32,19 +31,7 @@ void loop()
     String frqStr = String(frqInt);
     //frqStr.trim();
    
-    if(count < 20){
-      count +=1;
-      
-      if(count > 10){
-      movingSum += frqInt;
-     
-      if(count = 19){
-        movingAve = movingSum/9;
-      }
-      }
-    }
-
-    Serial.println(frqInt - 60000);
+ 
     if (!driver.init())
          Serial.println("init failed");
     
@@ -57,7 +44,7 @@ void loop()
     driver.waitPacketSent();
    
     //digitalWrite(13,HIGH);
-    delay(2000);
+    delay(200);
     
     //digitalWrite(13,LOW);
 
