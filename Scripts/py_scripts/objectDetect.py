@@ -5,6 +5,8 @@ import cv2, time
 # print(img)
 # print(img.shape)
 
+fdeviation = 0
+fthreshold = 50
 
 print("Starting object detection...")
 time.sleep(2)
@@ -18,6 +20,7 @@ print("First frame capture in 3 seconds.")
 # frame0gray = cv2.cvtColor(frame0,cv2.COLOR_BGR2GRAY)
 # frame = cv2.GaussianBlur(gray0,(21,21),0)
 
+detectBox =[]
 
 bkg_frame = None
 
@@ -41,7 +44,7 @@ while True:
     
     diff_frame_threshold = cv2.dilate(diff_frame_threshold, None, iterations=2)
     
-    (_,contours,_) = cv2.findContours(diff_frame_threshold.copy(),cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    _,contours,_ = cv2.findContours(diff_frame_threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     for contour in contours:
         if cv2.contourArea(contour) < 1000: #pixel
@@ -50,6 +53,18 @@ while True:
         (x,y,w,h) = cv2.boundingRect(contour)
     
         cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),3)
+
+    fdeviation += 1
+    print(fdeviation)
+    print(fdeviation%500)
+    
+    if fdeviation%50 == 0:
+        detectBox.append([x,y,w,h])        
+        
+        print(fdeviation%500)
+    
+    for x1,y1,w1,h1 in detectBox:
+        cv2.rectangle(frame,(x1,y1),(x1+w1,y1+h1),(255,0,0),3)
 
 
     #cv2.imshow("Background",bkg_frame)
@@ -60,7 +75,7 @@ while True:
 
     #print(diff_frame_threshold)
     
-    #time.sleep(0.1)    
+    time.sleep(0.1)    
     key=cv2.waitKey(1)
     print(key)
     if key == ord('q'):

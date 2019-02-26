@@ -22,12 +22,14 @@ void setup()
 void loop()
 {
     //Serial.println(FreqCounter::f_freq);
-    FreqCounter::f_comp= 12;             // Set compensation to 12
-    FreqCounter::start(100);            // Start counting with gatetime of 100ms
+    FreqCounter::f_comp= 30;             // Set compensation to 12
+    FreqCounter::start(300);            // Start counting with gatetime of 100ms
     
     while (FreqCounter::f_ready == 0)         // wait until counter ready
     frqInt=FreqCounter::f_freq;            // read result
-    Serial.println(FreqCounter::f_freq);
+    ///Serial.println(FreqCounter::f_freq);
+    
+    
     String frqStr = String(frqInt);
     //frqStr.trim();
    
@@ -44,7 +46,7 @@ void loop()
     driver.waitPacketSent();
    
     //digitalWrite(13,HIGH);
-    delay(200);
+    //delay(100);
     
     //digitalWrite(13,LOW);
 

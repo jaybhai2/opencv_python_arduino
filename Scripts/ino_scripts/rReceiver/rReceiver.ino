@@ -25,6 +25,7 @@ void loop()
     {
       text  += (char)buf[j];
     }
+    
   Serial.println(text);
   // Message with a good checksum received, dump it.
   //driver.printBuffer("Got:", buf, buflen);
