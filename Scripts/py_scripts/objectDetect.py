@@ -1,5 +1,6 @@
 import cv2, time
-
+import serial
+import numpy as np
 # img = cv2.imread(r'C:\Users\jay\Pictures\Capture.PNG')
 # print(type(img))
 # print(img)
@@ -24,7 +25,48 @@ detectBox =[]
 
 bkg_frame = None
 
+#----------------------  delta Time reader -----------------
+cnt = 0
+mywindow = 10
+thres=80
+def sma(data,window):
+    weights = np.repeat(1.0,window)/window
+    smas = np.convolve(data,weights,'valid')
+    # if len(sma) < mywindow:
+    #     return 0
+    # else: 
+    return smas
+serPort = serial.Serial('COM5',baudrate = 9600, timeout = 1)
+deltaTimes = []
+
+
+#----------------------
 while True:
+#----------------------  delta Time reader -----------------
+    cnt += 1
+    period = serPort.readline().decode('ascii')
+    period = period.strip()
+
+    if len(period) > 1:
+        deltaTime = int(period)
+        #if(tim > 0):
+        #freq = int(tim)
+        # freq = int(5000/tim*1000000-10000)
+        deltaTimes.append(time0)
+        #print(sma(x,mywindow))
+        if len(deltaTimes) > mywindow+1:
+            movingave = int(sma(deltaTimes,mywindow)[len(deltaTimes)-mywindow-1])
+            
+            diffT =abs(deltaTime - movingave)
+            if diffT > thres:
+                diffT = str(diffT) + "!!!!!!!!!!!!"
+            
+            print(str(deltaTime) + ' ' + str(movingave) + ' ' + str(diffT))
+
+        else:
+            print(deltaTime)
+#----------------------  delta Time reader -----------------
+
     check, frame = vd.read()
     print(check)
     
@@ -54,11 +96,11 @@ while True:
     
         cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),3)
 
-    fdeviation += 1
+    #fdeviation += 1
     print(fdeviation)
     print(fdeviation%500)
     
-    if fdeviation%50 == 0:
+    if diffT > thres:
         detectBox.append([x,y,w,h])        
         
         print(fdeviation%500)

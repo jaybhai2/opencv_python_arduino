@@ -15,7 +15,7 @@ RH_ASK driver(2000,"",3,10); // ESP8266: do not use pin 11
 
 SIGNAL(TIMER1_COMPA_vect)
 {
-  unsigned long currentTime = micros();  //return time that arduino is running in micro second
+  unsigned long currentTime = micros();  //return arduino running time
   
   deltaTime =  currentTime - lastDeltaTime; //  
   lastDeltaTime = currentTime; //store currentTime for next interrupt
@@ -26,14 +26,11 @@ SIGNAL(TIMER1_COMPA_vect)
   }
   else if (storedDeltaTime == 0)      //sample storedDeltaTime as base delta time
   {
-    storedDeltaTime = deltaTime;      //
+    storedDeltaTime = deltaTime;      
   }
   // Reset OCR1A
   OCR1A += CYCLES_PER_INTERRUPT;         //OCR1A = OCR1A + 5000
   //Serial.println(deltaTime);
-  
-
-  
 }
 
 void setup()
@@ -63,19 +60,17 @@ void setup()
 
 void loop()
 {
+   String pStr = String(deltaTime);
     
-    String pStr = String(deltaTime);
-    
-    char pChar[sizeof(pStr)+1];
-    pStr.toCharArray(pChar, sizeof(pChar));
+   char pChar[sizeof(pStr)+1];
+   pStr.toCharArray(pChar, sizeof(pChar));
    
-    //Serial.println(pChar);
+   delay(100);
+   //Serial.println(pChar); 
     
-    driver.send((uint8_t *)pChar, strlen(pChar));
-    driver.waitPacketSent();
+   driver.send((uint8_t *)pChar, strlen(pChar));
+   driver.waitPacketSent();
     
-    //delay(100); 
- 
 }
 
 

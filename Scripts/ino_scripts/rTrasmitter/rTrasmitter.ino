@@ -27,7 +27,7 @@ void loop()
     
     while (FreqCounter::f_ready == 0)         // wait until counter ready
     frqInt=FreqCounter::f_freq;            // read result
-    ///Serial.println(FreqCounter::f_freq);
+    Serial.println(FreqCounter::f_freq);
     
     
     String frqStr = String(frqInt);
@@ -41,7 +41,7 @@ void loop()
     frqStr.toCharArray(frqChar, sizeof(frqChar));
     //const char *frqChar = "efaefafe";
     
-    //Serial.println(frqChar);
+    Serial.println(frqChar);
     driver.send((uint8_t *)frqChar, strlen(frqChar));
     driver.waitPacketSent();
    
