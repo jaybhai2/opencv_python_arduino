@@ -7,7 +7,7 @@ import numpy as np
 # print(img.shape)
 
 fdeviation = 0
-fthreshold = 50
+fthreshold = 10
 
 print("Starting object detection...")
 time.sleep(2)
@@ -28,7 +28,8 @@ bkg_frame = None
 #----------------------  delta Time reader -----------------
 cnt = 0
 mywindow = 10
-thres=80
+thres=10
+
 nearVal = 100
 
 def sma(data,window):
@@ -39,7 +40,7 @@ def sma(data,window):
     # else: 
     return smas
 
-serPort = serial.Serial('COM5',baudrate = 9600, timeout = 1)
+serPort = serial.Serial('COM7',baudrate = 9600, timeout = 1)
 deltaTimes = []
 diffT = 0
 
@@ -69,7 +70,7 @@ while True:
                 print(str(deltaTime) + ' ' + str(movingave) + ' ' + str(diffT))
         else:
             print(deltaTime)
-#----------------------  delta Time reader -----------------
+#----------------------  delta Time reader end-----------------
 
     check, frame = vd.read()
     #print(check)
@@ -87,14 +88,14 @@ while True:
 
     #print(diff_frame)
     
-    _, diff_frame_threshold = cv2.threshold(diff_frame, 100, 255, cv2.THRESH_BINARY) # filter out all <30 from diff_frame
+    _, diff_frame_threshold = cv2.threshold(diff_frame, 50, 255, cv2.THRESH_BINARY) # filter out all <30 from diff_frame
     
     diff_frame_threshold = cv2.dilate(diff_frame_threshold, None, iterations=2)
     
     _,contours,_ = cv2.findContours(diff_frame_threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     for contour in contours:
-        if cv2.contourArea(contour) < 1000 or cv2.contourArea(contour) > 4000: #pixel
+        if cv2.contourArea(contour) < 800 or cv2.contourArea(contour) > 4000: #pixel
             continue
         
         (x,y,w,h) = cv2.boundingRect(contour)
@@ -117,13 +118,13 @@ while True:
         #print(fdeviation%500)
     
 
-
+  
     #cv2.imshow("Background",bkg_frame)
     #cv2.imshow("Current_Frame",cur_frame)
     #cv2.imshow("different_frame",diff_frame)
     #cv2.imshow("filtered_frame",diff_frame_threshold)
     cv2.imshow("frame",frame)
-
+    cv2.imshow("frame2",diff_frame_threshold)
     #print(diff_frame_threshold)
     
     #time.sleep(0.1)    

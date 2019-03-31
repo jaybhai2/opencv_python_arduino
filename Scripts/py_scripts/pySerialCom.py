@@ -6,7 +6,7 @@ import time
 import numpy as np
 
 mywindow = 10
-thres=80
+thres=85
 def sma(data,window):
     weights = np.repeat(1.0,window)/window
     smas = np.convolve(data,weights,'valid')
@@ -14,7 +14,7 @@ def sma(data,window):
     #     return 0
     # else: 
     return smas
-serPort = serial.Serial('COM5',baudrate = 9600, timeout = 1)
+serPort = serial.Serial('COM7',baudrate = 9600, timeout = 1)
 freq = 0
 
 # fig = pyplot.figure()
