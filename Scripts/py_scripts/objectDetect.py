@@ -12,7 +12,7 @@ fthreshold = 10
 print("Starting object detection...")
 time.sleep(2)
 
-vd = cv2.VideoCapture(0)  #0 denote first camera. if video file, input path
+vd = cv2.VideoCapture(1)  #0 denote first camera. if video file, input path
 
 print("Webcam opened.")
 print("First frame capture in 3 seconds.")
@@ -30,13 +30,13 @@ fps =  vd.get(cv2.CAP_PROP_FPS)
 print(str(width) + ' ' + str(height)+ ' ' + str(fps))
 time.sleep(2)
 
-subtract = cv2.createBackgroundSubtractorMOG2(history = 20,varThreshold=30)
+subtract = cv2.createBackgroundSubtractorMOG2(history = 20,varThreshold=60)
 
 #----------------------  delta Time reader -----------------
 cnt = 0
 mywindow = 4   # moving average window
 thres=10        
-nearVal = 100
+nearVal = 30
 
 def sma(data,window):
     weights = np.repeat(1.0,window)/window
@@ -89,13 +89,13 @@ while True:
         print(cur_frame.shape)
         continue
     diff_frame = cv2.absdiff(bkg_frame, cur_frame)
-    '''
+    
 
     #print(diff_frame)
-    
+    '''
     diff_frame = subtract.apply(frame)
     
-    _, diff_frame_threshold = cv2.threshold(diff_frame, 50, 255, cv2.THRESH_BINARY) # filter out all <30 from diff_frame
+    _, diff_frame_threshold = cv2.threshold(diff_frame, 30, 255, cv2.THRESH_BINARY) # filter out all <30 from diff_frame
     
     diff_frame_threshold = cv2.dilate(diff_frame_threshold, None, iterations=2)
     
@@ -103,30 +103,40 @@ while True:
     
     for contour in contours:
         boxArea = cv2.contourArea(contour)
-        '''
-        if cv2.contourArea(contour) < 200 or cv2.contourArea(contour) > 5000: #pixel
+        
+        if boxArea < 200 or boxArea > 10000: #pixel
             continue
-        '''
-
+        
         (x,y,w,h) = cv2.boundingRect(contour)
         
-        if int(diffT) > int(thres):            
-            if abs(curX - x) >= nearVal and abs(curY - y) >= nearVal:
-                detectBox.append([x,y,w,h])
+        distance = int(((abs(curX - x))**2 +  (abs(curY - y))**2)**(0.5))
+        
+        cv2.putText(frame, str(distance), (50, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), lineType=cv2.LINE_AA)
+
+        if int(diffT) > int(thres):      
+            if distance > nearVal:
+            #if (abs(curX - x) >= nearVal and abs(curY - y) >= nearVal):
+                midX = int((x+x+w)/2)
+                midY = int((y+y+h)/2)
+                detectBox.append([midX,midY,25])
                 curX = x
                 curY = y
                      
         cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),3)
+
         areaStr = str(boxArea)
         cv2.putText(frame, areaStr, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), lineType=cv2.LINE_AA) 
     #fdeviation += 1
     #print(fdeviation)
     #print(fdeviation%500)
     
+    '''
     for x1,y1,w1,h1 in detectBox:
         cv2.rectangle(frame,(x1,y1),(x1+w1,y1+h1),(255,0,0),3) 
-        
-        #print(fdeviation%500)
+    '''    
+      
+    for x1,y1,r1 in detectBox:
+        cv2.circle(frame,(x1,y1),r1,(255,0,0),3) 
     
 
   
@@ -135,7 +145,8 @@ while True:
     #cv2.imshow("different_frame",diff_frame)
     #cv2.imshow("filtered_frame",diff_frame_threshold)
     cv2.imshow("frame",frame)
-    cv2.imshow("delta",diff_frame_threshold)
+    cv2.resizeWindow('frame', 800,600)
+    #cv2.imshow("delta",diff_frame_threshold)
     #print(diff_frame_threshold)
     
     #time.sleep(0.1)    

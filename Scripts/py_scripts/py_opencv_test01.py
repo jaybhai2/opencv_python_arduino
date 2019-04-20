@@ -6,7 +6,7 @@ import numpy as np
 print("Starting object detection...")
 time.sleep(2)
 
-vd = cv2.VideoCapture(0)  #0 denote first camera. if video file, input path
+vd = cv2.VideoCapture(1)  #0 denote first camera. if video file, input path
 
 print("Webcam opened.")
 print("First frame capture in 3 seconds.")
@@ -20,7 +20,7 @@ fps =  vd.get(cv2.CAP_PROP_FPS)
 print(str(width) + ' ' + str(height)+ ' ' + str(fps))
 time.sleep(2)
 
-subtract = cv2.createBackgroundSubtractorMOG2(history = 20,varThreshold=30)
+subtract = cv2.createBackgroundSubtractorMOG2(history = 20,varThreshold=60)
 while True:
 
     check, frame = vd.read()
@@ -38,7 +38,7 @@ while True:
 
     diff_frame = cv2.absdiff(bkg_frame, cur_frame)
     '''
-    _,diff_frame_threshold = cv2.threshold(diff_frame, 100, 255, cv2.THRESH_BINARY) # filter out all <30 from diff_frame
+    _,diff_frame_threshold = cv2.threshold(diff_frame, 50, 255, cv2.THRESH_BINARY) # filter out all <30 from diff_frame
 
     diff_frame_threshold = cv2.dilate(diff_frame_threshold, None, iterations=2)
     
@@ -47,7 +47,7 @@ while True:
     
     for contour in contours:
         boxArea = cv2.contourArea(contour)
-        if boxArea < 1000: #pixel
+        if boxArea < 300: #pixel
            continue
         
         (x,y,w,h) = cv2.boundingRect(contour)
@@ -58,6 +58,7 @@ while True:
    
 
     cv2.imshow("different_frame",diff_frame)
+    cv2.resizeWindow('different_frame', 600,600)
     cv2.imshow("frame",frame)
 
     #print(diff_frame_threshold)
