@@ -22,14 +22,20 @@ print("First frame capture in 3 seconds.")
 # frame = cv2.GaussianBlur(gray0,(21,21),0)
 
 detectBox =[]
-
 bkg_frame = None
+
+width = vd.get(cv2.CAP_PROP_FRAME_WIDTH )
+height = vd.get(cv2.CAP_PROP_FRAME_HEIGHT )
+fps =  vd.get(cv2.CAP_PROP_FPS)
+print(str(width) + ' ' + str(height)+ ' ' + str(fps))
+time.sleep(2)
+
+subtract = cv2.createBackgroundSubtractorMOG2(history = 20,varThreshold=30)
 
 #----------------------  delta Time reader -----------------
 cnt = 0
-mywindow = 4
-thres=10
-
+mywindow = 4   # moving average window
+thres=10        
 nearVal = 100
 
 def sma(data,window):
@@ -42,8 +48,8 @@ def sma(data,window):
 
 serPort = serial.Serial('COM6',baudrate = 9600, timeout = 1)
 deltaTimes = []
-diffT = 0
 
+diffT = 0
 curX = 0
 curY = 0
 
@@ -73,20 +79,21 @@ while True:
 #----------------------  delta Time reader end-----------------
 
     check, frame = vd.read()
+
     #print(check)
-    
+    '''
     cur_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
     cur_frame = cv2.GaussianBlur(cur_frame,(21,21),0)
-
     if bkg_frame is None:
         bkg_frame = cur_frame
         print(cur_frame.shape)
         continue
-
     diff_frame = cv2.absdiff(bkg_frame, cur_frame)
-    
+    '''
 
     #print(diff_frame)
+    
+    diff_frame = subtract.apply(frame)
     
     _, diff_frame_threshold = cv2.threshold(diff_frame, 50, 255, cv2.THRESH_BINARY) # filter out all <30 from diff_frame
     
@@ -95,9 +102,12 @@ while True:
     _,contours,_ = cv2.findContours(diff_frame_threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     for contour in contours:
-        if cv2.contourArea(contour) < 500 or cv2.contourArea(contour) > 3000: #pixel
+        boxArea = cv2.contourArea(contour)
+        '''
+        if cv2.contourArea(contour) < 200 or cv2.contourArea(contour) > 5000: #pixel
             continue
-        
+        '''
+
         (x,y,w,h) = cv2.boundingRect(contour)
         
         if int(diffT) > int(thres):            
@@ -107,7 +117,8 @@ while True:
                 curY = y
                      
         cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),3)
-
+        areaStr = str(boxArea)
+        cv2.putText(frame, areaStr, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), lineType=cv2.LINE_AA) 
     #fdeviation += 1
     #print(fdeviation)
     #print(fdeviation%500)
@@ -124,7 +135,7 @@ while True:
     #cv2.imshow("different_frame",diff_frame)
     #cv2.imshow("filtered_frame",diff_frame_threshold)
     cv2.imshow("frame",frame)
-    cv2.imshow("frame2",diff_frame_threshold)
+    cv2.imshow("delta",diff_frame_threshold)
     #print(diff_frame_threshold)
     
     #time.sleep(0.1)    
