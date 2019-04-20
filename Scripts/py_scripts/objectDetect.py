@@ -27,7 +27,7 @@ bkg_frame = None
 
 #----------------------  delta Time reader -----------------
 cnt = 0
-mywindow = 10
+mywindow = 4
 thres=10
 
 nearVal = 100
@@ -40,7 +40,7 @@ def sma(data,window):
     # else: 
     return smas
 
-serPort = serial.Serial('COM7',baudrate = 9600, timeout = 1)
+serPort = serial.Serial('COM6',baudrate = 9600, timeout = 1)
 deltaTimes = []
 diffT = 0
 
@@ -95,7 +95,7 @@ while True:
     _,contours,_ = cv2.findContours(diff_frame_threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     for contour in contours:
-        if cv2.contourArea(contour) < 800 or cv2.contourArea(contour) > 4000: #pixel
+        if cv2.contourArea(contour) < 500 or cv2.contourArea(contour) > 3000: #pixel
             continue
         
         (x,y,w,h) = cv2.boundingRect(contour)
